@@ -1,0 +1,77 @@
+{% extends "base.html" %}
+
+{% block content %}
+    <h1 style="display: inline-block;">Manage Your Expenses</h1> 
+          <form class="login100-form validate-form flex-sb flex-w" method="GET" action="">
+          <div class="p-t-13 p-b-9" style="display: inline-block;">
+           <span class="txt1">
+              Description
+            </span>
+          </div>
+          <div class="wrap-input100 validate-input" >
+            <input class="input100" type="text" name="description" >
+            <span class="focus-input100"></span>
+          </div>
+          	<div class="container-login100-form-btn m-t-17">
+            <button class="login100-form-btn">
+             Submit
+            </button>
+          </div> 
+          <form>
+
+
+         <form class="login100-form validate-form flex-sb flex-w" method="DELETE" action="">
+          <div class="p-t-13 p-b-9" style="display: inline-block;">
+           <span class="txt1">
+             Enter the Description to Delete
+            </span>
+          </div>
+          <div class="wrap-input100 validate-input">
+            <input class="input100" type="text" name="delt" >
+            <span class="focus-input100"></span>
+          </div>
+          	<div class="container-login100-form-btn m-t-17">
+            <button class="login100-form-btn">
+             Submit
+            </button>
+          </div> 
+          <form>
+
+
+
+	    	<h3>
+    		Total Expense : {{ sum }}
+    	</h3>
+        <table id="fresh-table" class="table">
+            <thead>
+                <th data-field="id">Category</th>
+            	<th data-field="name" data-sortable="true">Description</th>
+            	<th data-field="artists" data-sortable="true">Amount</th>
+                <th data-field="danceability" data-sortable="true">date</th>
+            </thead>
+            <tbody>
+                {% for expense in expenses %}
+                <tr>
+                <td>{{ expense.category_id }}</td>    
+                <td>{{ expense.description }}</a></td>	        
+            	<td>{{ expense.amount }}</td>
+                <td>{{ expense.date }}</td>
+                </tr>
+                 {% endfor %}
+                 <tr>
+                 	<td>
+                 		<strong>Total Expense</strong>
+                 	</td>
+                 	<td>
+                 		
+                 	</td>
+                 	<td> 
+					<strong>{{ sum }}</strong>
+                 	</td>
+                 </tr>
+
+
+            </tbody>
+        </table> 
+
+{% endblock %}
