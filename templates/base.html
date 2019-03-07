@@ -30,6 +30,17 @@
     <link rel="stylesheet" href={% static 'simplesocial/css/master.css'%}>
 
 
+    <style type="text/css">
+      h2 {
+  text-align: center;
+}
+
+.p {
+  text-align: center;
+  padding-top: 130px;
+}
+    </style>
+
   </head>
 
 
@@ -84,15 +95,20 @@
   var $this = $(this);
   var fileName = $(this).data("file");
     $("#basicModal").data("fileName", fileName).modal("toggle", $this);
-  
 });
-
-$("#basicModal").on("shown.bs.modal", function(e){
-  //data-fileName attribute associated with the modal added in the click event of the button
-// alert($(this).data("fileName"));
-  //my data-file associated with the button 
-  // alert($(e.relatedTarget).data("file"));
-})
+  $(".sename").click(function(e){
+  e.preventDefault();
+  var $this = $(this);
+  var fileName = $(this).data("file");
+  $("#UserModal").data("fileName", fileName).modal("toggle", $this);
+});
+    $(".blnc").click(function(e){
+  e.preventDefault();
+  var $this = $(this);
+  var fileName = $(this).data("file");
+  $("#Balance").data("fileName", fileName).modal("toggle", $this);
+});
+         
 
  
   </script>

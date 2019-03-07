@@ -52,7 +52,7 @@
             <tbody>
                 {% for expense in expenses %}
                 <tr>
-                <td>{{ expense.category_id }}</td>    
+                <td>{{ expense.category__name }}</td>    
                 <td>{{ expense.description }}</a></td>	        
             	<td>{{ expense.amount }}</td>
                 <td>{{ expense.date }}</td>

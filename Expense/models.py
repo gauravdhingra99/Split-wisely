@@ -11,7 +11,7 @@ class Category(models.Model):
 
     def __str__(self):
 
-        return (self.name)
+        return str(self.pk)
 
 
 class Expense(models.Model):

@@ -25,12 +25,12 @@ def ExpenseListAPIView(request):
 			qs=Expense.objects.filter(user=request.user)
 			summ=Expense.objects.aggregate(Sum('amount'))
 			total=list(summ.values())[0]
-			return render(request,'Expense/Expense_Page.html',{"expenses": qs.values(),"sum":total})
+			return render(request,'Expense/Expense_Page.html',{"expenses": qs.values('category__name','description','amount','date'),"sum":total})
 		else:
 			qs=Expense.objects.filter(user=request.user,description=des)
 			summ=Expense.objects.filter(user=request.user,description=des).aggregate(Sum('amount'))
 			total=list(summ.values())[0]			
-			return render(request,'Expense/Expense_Page.html',{"expenses": qs.values(),"sum":total})
+			return render(request,'Expense/Expense_Page.html',{"expenses": qs.values('category__name','description','amount','date'),"sum":total})
 
 
 def ExpenseAddAPIView(request):
@@ -44,8 +44,8 @@ def ExpenseAddAPIView(request):
 		amount=request.POST.get('amount','')
 
 		if category and date and description and amount:
-			cat,created=Category.objects.get_or_create(name__iexact=category)
-			if created:
+			cat,cr=Category.objects.get_or_create(name=category)
+			if cr:
 				cat.save()
 			obj,created=Expense.objects.get_or_create(user=request.user,category=cat,date=date,description=description,amount=amount)
 			if created:
@@ -53,17 +53,11 @@ def ExpenseAddAPIView(request):
 			qs=Expense.objects.all()
 			summ=Expense.objects.aggregate(Sum('amount'))
 			total=list(summ.values())[0]
-			return render(request,'Expense/Expense_Page.html',{"expenses":qs.values(),"sum":total})
+			return render(request,'Expense/Expense_Page.html',{"expenses":qs.values('category__name'),"sum":total})
 		else:
 			return render(request,'Expense/Add_expense.html',{"message":"category ,description,amount,date required"})
 
 	return render(request,'Expense/Add_expense.html')
-
-
-
-
-
-
 
 
 
@@ -80,15 +74,22 @@ def AllGroups(request):
 def GroupExpenseView(request,id):
 
 	if request.method == 'GET':
+		UN=[]
 		groupname=[]
-		groupnae=[]
+		usernames=[]
 		grp=Group.objects.filter(id=id)		
-		print(grp.values())
 		for i in grp:
-			# print(i)
+
 			Allusers=User.objects.filter(groups__name=i)
+			for ussers in Allusers:
+				usernames.append(ussers)
+#			print(usernames)
+			Ausers=User.objects.all()
+			for uss in Ausers:
+				UN.append(uss)
+#			print(UN)
+
 			groups=GroupExpense.objects.filter(group=i)
-			# print(groups)
 			for j in groups:
 				groupname.append(j.group)
 				groupname.append(j.description)
@@ -98,7 +99,7 @@ def GroupExpenseView(request,id):
 				groupname.append(j.split)
 
 		# print(groupname)
-		return render(request,'Expense/Group_expense_Page2.html',{"groupname": groupname})
+		return render(request,'Expense/Group_expense_Page2.html',{"groupname": groupname ,"id":id ,"username":usernames,'ALLUSERS':UN})
 
 
 def Add_Group(request):
@@ -121,160 +122,153 @@ def Add_Group(request):
 
 
 
-	
+
+def Add_user_view(request,id):
+	#print("thihssssssss"+request.method)
+	if request.method=='POST':
+		usernames=[]
+		groupname=[]
+		UN=[]
+		Uname=request.POST.get('addUser')
+		Fname=User.objects.get(username=Uname)
+		if Fname and Uname:
+			my_group = Group.objects.get(id=id)
+			my_group.user_set.add(Fname)
+			grp=Group.objects.filter(id=id)		
+			for i in grp:
+				Allusers=User.objects.filter(groups__name=i)
+				for ussers in Allusers:
+					usernames.append(ussers)
+
+				Ausers=User.objects.all()
+				for uss in Ausers:
+					UN.append(uss)
+
+				groups=GroupExpense.objects.filter(group=i)
+				for j in groups:
+					groupname.append(j.group)
+					groupname.append(j.description)
+					groupname.append(j.date)	
+					groupname.append(j.amount)			
+					groupname.append(j.paidby)
+					groupname.append(j.split)
+
+
+			return render(request,'Expense/Group_expense_Page2.html',{"message":"User is Added",'username':usernames,'ALLUSERS':UN,"id":id,"groupname":groupname})
+		else:
+			return render(request,'Expense/Add_Group.html',{"message":"Users field cannot be empty",'username':usernames,'ALLUSERS':UN,"id":id,"groupname":groupname})
+
+	return render(request,'Expense/Group_expense_Page2.html',{'username':usernames})
 
 
 
 
 
-def GroupExpenseAddAPIView(request):
+	#my_group = Group.objects.get(name='DJ') 
+	#my_group.user_set.add(User.objects.get(id=2))
 
+
+
+def GroupExpenseAddAPIView(request,id):
 	if request.method == 'POST':
-
+		UN=[]
+		groupname=[]
+		usernames=[]	
 		description=request.POST.get('description','')
 		date=request.POST.get('date','')
 		amount=request.POST.get('amount','')
 		paidby=request.POST.get('paidby','')
 		split=request.POST.get('split','')
-		G_id=request.query_params.get('id')		
-		print(G_id)
-		if description and date and amount and paidby and split:
-			obj,created=GroupExpense.objects.get_or_create(group=,paidby=paidby,date=date,description=description,amount=amount,split=split)
-			if created:
-				obj.save()
-			qs=Expense.objects.all()
-			summ=Expense.objects.aggregate(Sum('amount'))
-			total=list(summ.values())[0]
-			return render(request,'Expense/Expense_Page.html',{"expenses":qs.values(),"sum":total})
+		grp=Group.objects.filter(id=id)	
+		userNam = User.objects.get(username=paidby)
+		if description and date and amount and paidby and grp and split:
+			obj=GroupExpense.objects.create(group=grp[0],paidby=userNam,date=date,description=description,amount=amount,split=split)
+			obj.save()
+			#print(obj)
+			#qs=GroupExpense.objects.all()
+
+			grp=Group.objects.filter(id=id)	   # All group of that id	
+			for i in grp:
+				Allusers=User.objects.filter(groups__name=i) # all Users in that group 
+				Count=Allusers.count()
+				for ussers in Allusers:
+					# print(type(ussers))
+					usernames.append(ussers)
+
+				Divamount=int(amount)/Count   	#Equal divided amoun'''
+				print(Divamount)
+
+				for Users_in_Group in Allusers:
+					cat,created=Category.objects.get_or_create(name='Group')
+					if created:
+						cat.save()
+					obj,created=Expense.objects.get_or_create(user=Users_in_Group,category=cat,date=date,description=description,amount=Divamount)
+					if created:
+						obj.save()
+
+				qs=Expense.objects.all()
+				print(qs)		
+				groups=GroupExpense.objects.filter(group=i) #Group Expense of that that Group 
+
+				Ausers=User.objects.all() # All Existing USers
+				for uss in Ausers:
+					UN.append(uss)
+
+				for j in groups:
+					groupname.append(j.group)
+					groupname.append(j.description)
+					groupname.append(j.date)	
+					groupname.append(j.amount)			
+					groupname.append(j.paidby)
+					groupname.append(j.split)
+
+
+			# summ=GroupExpense.objects.aggregate(Sum('amount'))
+			# total=list(summ.values())[0]
+			return render(request,'Expense/Group_expense_Page2.html',{"groupname":groupname,"username":usernames,'ALLUSERS':UN,"id":id})
 		else:
-			return render(request,'Expense/Add_Group_expense.html',{"message":"category ,description,amount,date required"})
+			return render(request,'Expense/Group_expense_Page2.html',{"message":"description,amount,date ,paid by ,split required","groupname":groupname,"username":usernames,'ALLUSERS':UN,"id":id})
 
-	return render(request,'Expense/Add_Group_expense.html')
+	return render(request,'Expense/Group_expense_Page2.html')
 
-
-
-
-
-
-
-
-
-# def CreateGroupExpense(request):
-# 	if request.method == 'POST':
-
-
-# def deleteview(request):
-# 	delt=request.GET.get('delt')
-# 	print(delt)
-# 	if delt!=None:
-# 		tbd=Expense.objects.filter(description=delt)
-# 		if tbd is not None:
-# 			tbd.delete()
-# 			data=Expense.objects.all()
-# 			return render(request,'Expense/Expense_Page.html',{"expenses": data.values()})
-# 		else:
-# 			return render(request,{"message":"This Discription in not available"})
 
 
 
 def ExpenseAddAPIView(request):
-
-
 	if request.method == 'POST':
 		#print(request.POST)
 		category=request.POST.get('category','')
 		date=request.POST.get('date','')
 		description=request.POST.get('description','')
 		amount=request.POST.get('amount','')
-
+		groupname=[]
 		if category and date and description and amount:
-			cat,created=Category.objects.get_or_create(name__iexact=category)
-			if created:
+			cat,cr=Category.objects.get_or_create(name=category)
+			if cr:
 				cat.save()
 			obj,created=Expense.objects.get_or_create(user=request.user,category=cat,date=date,description=description,amount=amount)
 			if created:
 				obj.save()
-			qs=Expense.objects.all()
+			qs=Expense.objects.filter(user=request.user)
+			# user=request.user
+			# grp=Group.objects.filter(id=user.id)
+			# groups=GroupExpense.objects.filter(group=grp[0])
+			# for j in groups:
+			# 	groupname.append(j.group)
+			# 	groupname.append(j.description)
+			# 	groupname.append(j.date)	
+			# 	groupname.append(j.amount)			
+			# 	groupname.append(j.paidby)
+			# 	groupname.append(j.split)
+
+
 			summ=Expense.objects.aggregate(Sum('amount'))
 			total=list(summ.values())[0]
-			return render(request,'Expense/Expense_Page.html',{"expenses":qs.values(),"sum":total})
+			return render(request,'Expense/Expense_Page.html',{"expenses":qs.values('category__name','description','amount','date'),"sum":total})
 		else:
 			return render(request,'Expense/Add_expense.html',{"message":"category ,description,amount,date required"})
 
 	return render(request,'Expense/Add_expense.html')
-
-
-
-
-
-# class ExpenseListAPIView(APIView):
-
-# 	renderer_classes = [TemplateHTMLRenderer]
-# 	template_name = 'Expense/index.html'	
-
-# 	def get(self,request):
-# 		print(request.GET)
-# 		des=request.query_params.get('description')
-# 		if des==None:
-# 			qs=Expense.objects.filter(user=request.user)
-# 			# print(qs)
-# 			return Response({'expenses': qs.values()})
-# 		else:
-# 			qs=Expense.objects.filter(user=request.user,description=des)
-# 			# print(qs)
-# 			return Response({'expenses': qs.values()})
-
-
-# class ExpenseAddAPIView(APIView):
-	
-	# renderer_classes = [TemplateHTMLRenderer]
-	# template_name = 'Expense/Expense_Page.html'	
-
-
-
-	# def post(self,request):
-	# 	# print(request.data)
-	# 	category=request.data.get('category','')
-	# 	date=request.data.get('date','')
-	# 	description=request.data.get('description','')
-	# 	amount=request.data.get('amount','')
-	# 	# print(category)
-	# 	# print(type(category))
-		
-
-	# 	if category and date and description and amount:
-	# 		cat,created=Category.objects.get_or_create(name=category)
-	# 		if created:
-	# 			# print(cat)
-	# 			cat.save()
-	# 		# print(request.user)
-	# 		qs,namea=Expense.objects.get_or_create(user=request.user,category=cat,date=date,description=description,amount=amount)
-	# 		if namea:
-	# 			qs.save()
-	# 		return Response({"data":qs.values()},status=200)
-	# 	else:
-	# 		return Response({"category ,description,amount,date required "},status=400)
-
-
-
-	# def delete(self,request):
-	# 	print("sdadadasd"+request.data)
-	# 	description=request.data.get("description")
-	# 	print("des"+description)
-	# 	if description:
-	# 		des=Expense.objects.filter(description=description)
-	# 		if des is not None:
-	# 			des.delete()
-	# 			data=Expense.objects.all()
-	# 			return Response({"data":data},status=200)
-	# 		else:
-	# 			return Response({"This Discription in not available"},status=400)
-	# 	else:
-	# 		return Response({"This Discription is REquired to delete"},status=400)	
-
-
-
-	
 
 
 

@@ -9,8 +9,9 @@ urlpatterns = [
 	path('addexpense/',ExpenseAddAPIView,name='addexpense'),
 	path('GroupExpenses/',AllGroups,name='groups'),
 	path('AddGroup/',Add_Group,name='Add_groups'),
+	re_path(r'^GroupExpenses/(?P<id>[0-9]+)/Add_user/',Add_user_view,name='Add_user'),
 	re_path(r'^GroupExpenses/(?P<id>[0-9]+)$',GroupExpenseView,name='group_expenses'),
-	path('addGroupexpense/',GroupExpenseAddAPIView ,name="addgroupexpenses"),
+	re_path(r'^addGroupexpense/(?P<id>[0-9]+)$',GroupExpenseAddAPIView ,name="addgroupexpenses"),
 	]
 
 

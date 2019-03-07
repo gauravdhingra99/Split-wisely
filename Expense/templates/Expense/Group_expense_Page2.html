@@ -7,8 +7,11 @@
 
   <div class="row text-center">
 
-      <a  href="#" data-file="my file 1" class="btn btn-lg btn-success rename"  >Add Group Expense  </a>
+      <a  href="#" data-file="my file 1" class="btn btn-lg btn-success rename" data-target="#basicModal"  >Add Group Expense </a>
     <br />
+     <a  href="#" data-file="my file 2" class="btn btn-lg btn-success sename" data-target="#UserModal" >Add User to Group</a>
+        <br />
+             <a href="#" data-file="my file 2" class="btn btn-lg btn-success blnc" data-target="#Balance" >Balances</a>
   </div>
   <hr>
     
@@ -21,21 +24,9 @@
         <h4 class="modal-title" id="myModalLabel">Add Expense</h4>
       </div>
       <div class="modal-body">
-                <form class="login100-form validate-form flex-sb flex-w" method="POST" action="">
+                <form class="login100-form validate-form flex-sb flex-w" method="POST" action="/accounts/Expense/addGroupexpense/{{ id }}">
           {% csrf_token %}
-            <h2>
-                {{ message|safe }}
-            </h2>          
-             <div class="p-t-31 p-b-9">
-            <span class="txt1">
-              Category:  
-            </span>
-          </div>
-          <div class="wrap-input100 validate-input" data-validate = "Category is required">
-            <input class="input100" type="text" name="category" >
-            <span class="focus-input100"></span>
-          </div>
-
+          <h2>{{ id }}</h2>
           <div class="p-t-13 p-b-9">
             <span class="txt1">
               Description
@@ -67,6 +58,31 @@
           </div>
 
 
+        <div class="p-t-13 p-b-9">
+            <span class="txt1">
+              Paid by
+            </span> 
+          </div>
+
+        <select name="paidby">
+            {% for users in username %}
+          <option  name=paidby value={{ users }}>{{ users }}</option>
+            {% endfor %}
+            </select>
+
+        <div class="p-t-13 p-b-9">
+            <span class="txt1">
+              Split
+            </span>
+          </div>
+
+        <select name="split">
+        <option  name=split value=True>Split Equally</option>
+          <option  name=split value=False>Split UnEqually</option>  
+</select>
+
+
+
           <div class="container-login100-form-btn m-t-17">
             <button class="login100-form-btn">
              Submit
@@ -76,9 +92,65 @@
          </form>
 
       </div>
-      <div class="modal-footer">
-        <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
-        <button type="button" class="btn btn-primary">Save changes</button>
+    </div>
+  </div>
+</div>
+
+<div class="modal fade" id="UserModal" tabindex="-1" role="dialog" aria-labelledby="UserModal" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+        <h4 class="modal-title" id="myModalLabel">Add User</h4>
+      </div>
+      <div class="modal-body">
+                <form class="login100-form validate-form flex-sb flex-w" method="POST" action="/accounts/Expense/GroupExpenses/{{ id }}/Add_user/">
+          {% csrf_token %}
+       
+        <div class="p-t-13 p-b-9">
+            <span class="txt1">
+             Select User
+            </span>
+          </div>
+
+        <select name="addUser">
+            {% for users in ALLUSERS %}
+          <option  name=addUser value={{ users }}>{{ users }}</option>
+            {% endfor %}
+            </select>
+
+
+          <div class="container-login100-form-btn m-t-17">
+            <button class="login100-form-btn">
+             Submit
+            </button>
+          </div>          
+
+         </form>
+
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="modal fade" id="Balance" tabindex="-1" role="dialog" aria-labelledby="Balance" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+        <h4 class="modal-title" id="myModalLabel">Group Balances</h4>
+      </div>
+      <div class="modal-body">
+            
+
+        <div class="p-t-13 p-b-9">
+            <span class="txt1">
+
+
+            </span>
+          </div>
+
+
       </div>
     </div>
   </div>
@@ -87,6 +159,7 @@
 
 
 
+        <h2> {{ message|safe }} </h2>
    <table id="fresh-table" class="table">
             <thead>
                 <th data-field="id">Group</th>
@@ -106,6 +179,13 @@
 
             </tbody>
         </table> 
+
+        {% for userss in username %}
+        <h2>
+            {{ userss }}
+        </h2>
+
+        {% endfor%}
 
 
 
