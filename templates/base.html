@@ -2,8 +2,18 @@
 {% load staticfiles %}
 <html>
   <head>
+
     <meta charset="utf-8">
     <title>Star Social</title>
+
+
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.0/css/bootstrap.min.css">
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.0/js/bootstrap.min.js"></script>
+
+
+
     <!-- Latest compiled and minified CSS -->
 
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
@@ -32,7 +42,8 @@
 
     					<ul class="nav navbar-nav navbar-right">
     						{% if user.is_authenticated %}
-                      <li><a href="#"class="btn btn-simple">Groups</a></li>
+                      <li><a href="{% url 'Expense:Add_groups' %}"class="btn btn-simple">Add Groups</a></li>            
+                      <li><a href="{% url 'Expense:groups' %}"class="btn btn-simple">Groups</a></li>
                       <li><a href="{% url 'Expense:expenses' %}" class="btn btn-simple">Expenses</a></li> 
                       <li><a href="{% url 'Expense:addexpense' %}" class="btn btn-simple">Add Expenses</a></li> 
                       <li><a href="{% url 'accounts:logout' %}" class="btn btn-simple">Log out</a></li>
@@ -66,4 +77,23 @@
 
   </body>
   <script src="{% static "/simplesocial/js/master.js" %}" type="text/javascript" ></script>
+
+  <script type="text/javascript">
+    $(".rename").click(function(e){
+  e.preventDefault();
+  var $this = $(this);
+  var fileName = $(this).data("file");
+    $("#basicModal").data("fileName", fileName).modal("toggle", $this);
+  
+});
+
+$("#basicModal").on("shown.bs.modal", function(e){
+  //data-fileName attribute associated with the modal added in the click event of the button
+// alert($(this).data("fileName"));
+  //my data-file associated with the button 
+  // alert($(e.relatedTarget).data("file"));
+})
+
+ 
+  </script>
 </html>

@@ -1,0 +1,12 @@
+{% extends "base.html" %}
+
+{% block content %}
+      <h1> All Groups </h1>
+      <ul>
+        {% for groups in groupname %}
+        <li><a href="/accounts/Expense/GroupExpenses/{{groups.id}}">{{ groups.name }}</a></li>
+        {% endfor %}
+      </ul>
+        
+
+{% endblock %}
