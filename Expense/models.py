@@ -20,7 +20,7 @@ class Expense(models.Model):
     date = models.DateField()
     description = models.CharField(max_length=300)
     amount = models.FloatField()
-
+    owe=models.FloatField(default=0.0)
 
     def __str__(self):
         return self.description

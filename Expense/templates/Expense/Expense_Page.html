@@ -46,7 +46,8 @@
             <thead>
                 <th data-field="id">Category</th>
             	<th data-field="name" data-sortable="true">Description</th>
-            	<th data-field="artists" data-sortable="true">Amount</th>
+            	<th data-field="artists" data-sortable="true">Amount/Paid</th>
+            <th data-field="artists" data-sortable="true">Owe/Owed</th>
                 <th data-field="danceability" data-sortable="true">date</th>
             </thead>
             <tbody>
@@ -55,6 +56,7 @@
                 <td>{{ expense.category__name }}</td>    
                 <td>{{ expense.description }}</a></td>	        
             	<td>{{ expense.amount }}</td>
+              <td>{{ expense.owe }}</td>              
                 <td>{{ expense.date }}</td>
                 </tr>
                  {% endfor %}

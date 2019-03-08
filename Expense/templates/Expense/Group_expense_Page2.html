@@ -5,13 +5,13 @@
   
 
 
-  <div class="row text-center">
+  <div class="text-center">
 
-      <a  href="#" data-file="my file 1" class="btn btn-lg btn-success rename" data-target="#basicModal"  >Add Group Expense </a>
+      <a  href="#" data-file="my file 1" class="btn btn-lg btn-danger rename" data-target="#basicModal"  >Add Group Expense </a>
     <br />
      <a  href="#" data-file="my file 2" class="btn btn-lg btn-success sename" data-target="#UserModal" >Add User to Group</a>
         <br />
-             <a href="#" data-file="my file 2" class="btn btn-lg btn-success blnc" data-target="#Balance" >Balances</a>
+             <a href="#" data-file="my file 2" class="btn btn-lg btn-success blnc" data-target="#Balance" >Group Users</a>
   </div>
   <hr>
     
@@ -26,7 +26,6 @@
       <div class="modal-body">
                 <form class="login100-form validate-form flex-sb flex-w" method="POST" action="/accounts/Expense/addGroupexpense/{{ id }}">
           {% csrf_token %}
-          <h2>{{ id }}</h2>
           <div class="p-t-13 p-b-9">
             <span class="txt1">
               Description
@@ -57,19 +56,6 @@
             <span class="focus-input100"></span>
           </div>
 
-
-        <div class="p-t-13 p-b-9">
-            <span class="txt1">
-              Paid by
-            </span> 
-          </div>
-
-        <select name="paidby">
-            {% for users in username %}
-          <option  name=paidby value={{ users }}>{{ users }}</option>
-            {% endfor %}
-            </select>
-
         <div class="p-t-13 p-b-9">
             <span class="txt1">
               Split
@@ -81,6 +67,27 @@
           <option  name=split value=False>Split UnEqually</option>  
 </select>
 
+
+
+
+        <div class="p-t-13 p-b-9">
+            <span class="txt1">
+              Paid by
+            </span> 
+          </div>
+
+        <select name="paidby" id="mySelect" onChange="check(this);">
+            {% for users in username %}
+          <option  name=paidby value={{ users }}>{{ users }}</option>
+            {% endfor %}
+            </select>
+        <div id="other-div" style="display:none;">
+            {% for users in Musernames %}        
+        <label>{{ users }}
+        <input name = {{users}} id="other-input" type="number">
+            {% endfor %}
+        </label>
+        </div>
 
 
           <div class="container-login100-form-btn m-t-17">
@@ -138,10 +145,18 @@
     <div class="modal-content">
       <div class="modal-header">
         <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
-        <h4 class="modal-title" id="myModalLabel">Group Balances</h4>
+        <h4 class="modal-title" id="myModalLabel">Group Users</h4>
       </div>
       <div class="modal-body">
-            
+
+                <h2>All Users In the Group</h2>
+
+        {% for userss in Musernames %}
+        <h3>
+            {{ userss }}
+        </h3>
+        {% endfor%}
+
 
         <div class="p-t-13 p-b-9">
             <span class="txt1">
@@ -179,13 +194,6 @@
 
             </tbody>
         </table> 
-
-        {% for userss in username %}
-        <h2>
-            {{ userss }}
-        </h2>
-
-        {% endfor%}
 
 
 
