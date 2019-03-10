@@ -8,10 +8,11 @@
   <div class="text-center">
 
       <a  href="#" data-file="my file 1" class="btn btn-lg btn-danger rename" data-target="#basicModal"  >Add Group Expense </a>
-    <br />
      <a  href="#" data-file="my file 2" class="btn btn-lg btn-success sename" data-target="#UserModal" >Add User to Group</a>
-        <br />
              <a href="#" data-file="my file 2" class="btn btn-lg btn-success blnc" data-target="#Balance" >Group Users</a>
+             <a href="#" data-file="my file 2" class="btn btn-lg btn-success NNblnc" data-target="#SHB" >Balances</a>
+
+
   </div>
   <hr>
     
@@ -27,42 +28,42 @@
                 <form class="login100-form validate-form flex-sb flex-w" method="POST" action="/accounts/Expense/addGroupexpense/{{ id }}">
           {% csrf_token %}
           <div class="p-t-13 p-b-9">
-            <span class="txt1">
+            <h4 class="txt1">
               Description
-            </span>
+            </h4>
           </div>
           <div class="wrap-input100 validate-input" data-validate = "Description is required">
-            <input class="input100" type="text" name="description" >
+            <input class="input100 input-phone" type="text" name="description" >
             <span class="focus-input100"></span>
           </div>
 
            <div class="p-t-13 p-b-9">
-            <span class="txt1">
+            <h4 class="txt1">
              Amount
-            </span>
+            </h4>
           </div>
           <div class="wrap-input100 validate-input" data-validate = "Description is required">
-            <input class="input100" type="number" name="amount" >
+            <input class="input100 input-phone" type="number" name="amount" >
             <span class="focus-input100"></span>
           </div>
 
           <div class="p-t-13 p-b-9">
-            <span class="txt1">
+            <h4 class="txt1">
               Date
-            </span>
+            </h4>
           </div>
           <div class="wrap-input100 validate-input" data-validate = "Date is required">
-            <input class="input100" type="date" name="date" >
+            <input class="input100 input-phone " type="date" name="date" >
             <span class="focus-input100"></span>
           </div>
 
         <div class="p-t-13 p-b-9">
-            <span class="txt1">
+            <h4 class="txt1">
               Split
-            </span>
+            </h4>
           </div>
 
-        <select name="split">
+        <select name="split" style="font-size: 25px;background-color: #d9edf7;border-radius: 40px;padding: 5px 5px;" >
         <option  name=split value=True>Split Equally</option>
           <option  name=split value=False>Split UnEqually</option>  
 </select>
@@ -71,12 +72,12 @@
 
 
         <div class="p-t-13 p-b-9">
-            <span class="txt1">
+            <h4 class="txt1">
               Paid by
-            </span> 
+            </h4> 
           </div>
 
-        <select name="paidby" id="mySelect" onChange="check(this);">
+        <select name="paidby" id="mySelect" onChange="check(this);" style="font-size: 25px;background-color: #d9edf7;border-radius: 40px;padding: 5px 5px;" >
             {% for users in username %}
           <option  name=paidby value={{ users }}>{{ users }}</option>
             {% endfor %}
@@ -84,11 +85,10 @@
         <div id="other-div" style="display:none;">
             {% for users in Musernames %}        
         <label>{{ users }}
-        <input name = {{users}} id="other-input" type="number">
+        <input class="input-phone" name = {{users}} id="other-input" type="number">
             {% endfor %}
         </label>
         </div>
-
 
           <div class="container-login100-form-btn m-t-17">
             <button class="login100-form-btn">
@@ -115,12 +115,12 @@
           {% csrf_token %}
        
         <div class="p-t-13 p-b-9">
-            <span class="txt1">
+            <h3 class="txt1">
              Select User
-            </span>
+            </h3>
           </div>
 
-        <select name="addUser">
+        <select name="addUser" style="font-size: 25px;background-color: #d9edf7;border-radius: 40px;padding: 5px 5px;position: relative;top: -5px;">
             {% for users in ALLUSERS %}
           <option  name=addUser value={{ users }}>{{ users }}</option>
             {% endfor %}
@@ -171,6 +171,42 @@
   </div>
 </div>
 
+<div class="modal fade" id="SHB" tabindex="-1" role="dialog" aria-labelledby="SHB" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+        <h4 class="modal-title" id="myModalLabel">Balnces</h4>
+      </div>
+      <div class="modal-body">
+
+        <h2>Balances For : {{ description }}</h2>
+        
+
+            {% for p,m in PAID.items %}
+                <h3> {{ p }} Paid : {{ m }}</h3>
+            {% endfor %}
+
+            
+                {% for i,j in Dict1.items %}
+                       <h3> {{ i }} Gets Back Rs.{{ j  }} </h3>
+                    {% endfor %}
+   
+                    {% for k,l in Dict2.items %}
+                         <h3> {{k}} Owes {{ l }} </h3>
+                    {% endfor %}
+
+
+        <div class="p-t-13 p-b-9">
+            <span class="txt1">
+                {{ disclamer }}
+            </span>
+          </div>
+      </div>
+    </div>
+  </div>
+</div>
+
 
 
 
@@ -181,7 +217,7 @@
             	<th data-field="name" data-sortable="true">Description</th>
             	<th data-field="artists" data-sortable="true">date</th>
                 <th data-field="danceability" data-sortable="true">amount</th>
-                <th data-field="danceability" data-sortable="true">Paidby</th>
+                <th data-field="danceability" data-sortable="true">Paid By</th>
                 <th data-field="danceability" data-sortable="true">Split</th>
             </thead>
             <tbody>

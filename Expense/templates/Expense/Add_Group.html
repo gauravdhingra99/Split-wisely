@@ -3,7 +3,7 @@
 {% block content %}
 
 
-    <h1>Welcome to Add  Group Expense Page</h1>
+    <h1>Add Group Bill</h1>
 
         <form class="login100-form validate-form flex-sb flex-w" method="POST" action="">
           {% csrf_token %}
@@ -16,7 +16,7 @@
             </span>
           </div>
           <div class="wrap-input100 validate-input" data-validate = "Group_Name is required">
-            <input class="input100" type="text" name="groupname" >
+            <input class="input100 input-phone " type="text" name="groupname" >
             <span class="focus-input100"></span>
           </div>
 

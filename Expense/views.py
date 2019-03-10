@@ -60,14 +60,24 @@ def ExpenseAddAPIView(request):
 	return render(request,'Expense/Add_expense.html')
 
 
-
-
-
+def ExpenseDelView(request):
+	if request.method == 'GET':
+		print(request.method)
+		des=request.GET.get('delt')	
+		if des!=None:
+			qs=Expense.objects.filter(user=request.user,description=des)
+			qs.delete()
+			queryset=Expense.objects.filter(user=request.user)
+			print(qs)
+			return render(request,'Expense/Expense_Page.html',{"expenses": queryset.values('category__name','description','owe','amount','date')})
+		else:
+			return render(request,'Expense/Expense_Page.html',{"message":message,"expenses": qs.values('category__name','description','owe','amount','date')})
 
 
 def AllGroups(request):
 	if request.method == 'GET':
-		grp=Group.objects.filter(user=request.user)
+		user=request.user
+		grp=user.groups.all()
 	return render(request,'Expense/Group_expense_Page.html',{"groupname": grp.values()})
 
 
@@ -106,8 +116,10 @@ def GroupExpenseView(request,id):
 				else:
 					groupname.append("UnEqually")
 
+			pdl="Add Group Expense-Balances Will Update"
+
 		# print(groupname)
-		return render(request,'Expense/Group_expense_Page2.html',{"groupname": groupname ,"id":id ,"username":usernames,'ALLUSERS':UN,'Musernames':Musernames})
+		return render(request,'Expense/Group_expense_Page2.html',{"groupname": groupname ,"id":id ,"username":usernames,'ALLUSERS':UN,'Musernames':Musernames,"disclamer":pdl})
 
 
 def Add_Group(request):
@@ -121,7 +133,8 @@ def Add_Group(request):
 				Grop.save()
 			my_group = Group.objects.get(name=Grop.name) 
 			my_group.user_set.add(request.user)
-			Groups=Group.objects.all()
+			user=request.user
+			Groups=user.groups.all()
 			return render(request,'Expense/Group_expense_Page.html',{"groupname":Groups.values()})
 		else:
 			return render(request,'Expense/Add_Group.html',{"message":"Group name required"})
@@ -221,7 +234,7 @@ def GroupExpenseAddAPIView(request,id):
 		if paidby== 'Multiple-Users':
 			cnt=0
 			while(cnt<Count):
-				y=request.POST.get(str(Musernames[cnt]),'')
+				y=request.POST.get(str(Musernames[cnt]),'0')
 				pdlist.append(int(y))
 				userNam.append(User.objects.get(username=Musernames[cnt]))
 				cnt=cnt+1
@@ -254,12 +267,21 @@ def GroupExpenseAddAPIView(request,id):
 			Divamount=int(amount)/Count
 			Famount=int(amount)-Divamount
 			Dicts={userNam[0]:Famount}
+			Dict1={userNam[0]:Famount}
+			Dict2={'':''}
+			ul=0
+			pdlist.append(amount)
 			for Users_in_Group in Allusers:
 				if Users_in_Group !=userNam[0]:
+					pdlist.append(0)
 					Dicts.update({Users_in_Group:"-"+str(Divamount)})
+					Dict2.update({Users_in_Group:(Divamount)})
 				else:
 					continue
 			print(Dicts)
+			
+			del Dict2['']
+
 
 
 
@@ -290,8 +312,13 @@ def GroupExpenseAddAPIView(request,id):
 				else:
 					groupname.append("UnEqually")
 
+				print(groupname)
 
-			return render(request,'Expense/Group_expense_Page2.html',{"groupname":groupname,"username":usernames,'ALLUSERS':UN,"id":id,"Musernames":Musernames})
+			pdl={userNam[0]:amount}
+	
+
+
+			return render(request,'Expense/Group_expense_Page2.html',{"groupname":groupname,"username":usernames,'ALLUSERS':UN,"id":id,"Musernames":Musernames,"Dicts":Dicts,"Dict1":Dict1,"Dict2":Dict2,"NM":userNam[0],"PAID":pdl,"description":description})
 
 		elif description and date and amount and paidby=='Multiple-Users' and grp and split:
 			obj=GroupExpense.objects.create(group=grp[0],paidby=userNam[0],date=date,description=description,amount=amount,split=split)
@@ -304,7 +331,20 @@ def GroupExpenseAddAPIView(request,id):
 			while(c<len(pdlist)):
 				finlst.append(pdlist[c]-Divamount)
 				c=c+1
-			
+			Dict1={"":""}
+			Dict2={"":""}
+			c=0
+			while(c<len(finlst)):
+				if(finlst[c]>0):
+					Dict1.update({userNam[c]:finlst[c]})
+				else:
+					Dict2.update({userNam[c]:abs(int(finlst[c]))})
+				c=c+1
+			del Dict2['']
+			del Dict1['']
+			print(Dict1)
+			print(Dict2)
+			print(userNam)
 			print(pdlist)
 			print(Divamount)
 			print(finlst)
@@ -331,8 +371,19 @@ def GroupExpenseAddAPIView(request,id):
 				else:
 					groupname.append("UnEqually")
 
+			print(groupname)
+
+			pdl={"":""}
+			i=0
+			while(i<len(pdlist)):
+				pdl.update({userNam[i]:pdlist[i]})
+				i=i+1
+
+			del pdl['']
+
 				
-			return render(request,'Expense/Group_expense_Page2.html',{"groupname":groupname,"username":usernames,'ALLUSERS':UN,"id":id,"Musernames":Musernames})
+
+			return render(request,'Expense/Group_expense_Page2.html',{"groupname":groupname,"username":usernames,'ALLUSERS':UN,"id":id,"Musernames":Musernames,"Dict1":Dict1,"Dict2":Dict2,"PAID":pdl,"description":description})
 		
 
 		else:
