@@ -5,7 +5,9 @@ from django.core import serializers
 from django.http import JsonResponse
 
 
-
+# PAYERS=list()
+# OWERS=list()
+# PAIDEE=list()
 from rest_framework import generics,mixins
 from django.shortcuts import get_object_or_404
 
@@ -203,7 +205,8 @@ def GroupExpenseAddAPIView(request,id):
 	UN=[]
 	groupname=[]
 	usernames=[]	
-	Musernames=[]	
+	Musernames=[]
+	onlyusername=[]	
 	if request.method == 'POST':
 		grp=Group.objects.filter(id=id)	
 		for i in grp:
@@ -212,7 +215,7 @@ def GroupExpenseAddAPIView(request,id):
 			for ussers in Allusers:
 				usernames.append(ussers)
 				Musernames.append(ussers)
-
+				onlyusername.append(ussers.username)
 
 			usernames.append('Multiple-Users')
 
@@ -225,6 +228,7 @@ def GroupExpenseAddAPIView(request,id):
 
 		pdlist=[]
 		userNam=[]
+		userName=[]
 		description=request.POST.get('description','')
 		date=request.POST.get('date','')
 		amount=request.POST.get('amount','')
@@ -237,6 +241,7 @@ def GroupExpenseAddAPIView(request,id):
 				y=request.POST.get(str(Musernames[cnt]),'0')
 				pdlist.append(int(y))
 				userNam.append(User.objects.get(username=Musernames[cnt]))
+				userName.append(Musernames[cnt])
 				cnt=cnt+1
 			if sum(pdlist)!= int(amount):
 				return render(request,'Expense/Group_expense_Page2.html',{"message":"amount and Distribution of money is not Same Please Add Again","groupname":groupname,"username":usernames,'ALLUSERS':UN,"id":id,"Musernames":Musernames})
@@ -258,16 +263,22 @@ def GroupExpenseAddAPIView(request,id):
 
 
 		
-		
-
+		print("--------------------------------------------")
+		print(onlyusername)
 		if description and date and amount and paidby!='Multiple-Users' and grp and split:
 			print('here')
-			obj=GroupExpense.objects.create(group=grp[0],paidby=userNam[0],date=date,description=description,amount=amount,split=split)
+			obj=GroupExpense.objects.create(group=grp[0],paidby=paidby,date=date,description=description,amount=amount,split=split)
 			obj.save()
-			Divamount=int(amount)/Count
-			Famount=int(amount)-Divamount
+			if len(Allusers)>1:
+				Divamount=int(amount)/Count
+				Famount=int(amount)-Divamount
+			else:
+				Famount=int(amount)
+
 			Dicts={userNam[0]:Famount}
+			#print(Dicts)
 			Dict1={userNam[0]:Famount}
+			global Dict2
 			Dict2={'':''}
 			ul=0
 			pdlist.append(amount)
@@ -278,13 +289,21 @@ def GroupExpenseAddAPIView(request,id):
 					Dict2.update({Users_in_Group:(Divamount)})
 				else:
 					continue
-			print(Dicts)
-			
 			del Dict2['']
+			# for i in PAYERS:
+			# 	for j,k in i.items():
+			# 		for l in OWERS:
+			# 			for m,n in l.items():
+			# 				if j==m:
+			# 					k=k-n
+			# 					dict.update({j:k})
+			 	
 
+			
+			
 
-
-
+			pdl={userNam[0]:amount}
+			
 			for U_in_Group,FO in Dicts.items():
 				cat,created=Category.objects.get_or_create(name='Group - ' + str(Gpn))
 				if created:
@@ -312,16 +331,18 @@ def GroupExpenseAddAPIView(request,id):
 				else:
 					groupname.append("UnEqually")
 
-				print(groupname)
+				#print(groupname)
 
-			pdl={userNam[0]:amount}
+			
 	
 
 
 			return render(request,'Expense/Group_expense_Page2.html',{"groupname":groupname,"username":usernames,'ALLUSERS':UN,"id":id,"Musernames":Musernames,"Dicts":Dicts,"Dict1":Dict1,"Dict2":Dict2,"NM":userNam[0],"PAID":pdl,"description":description})
 
 		elif description and date and amount and paidby=='Multiple-Users' and grp and split:
-			obj=GroupExpense.objects.create(group=grp[0],paidby=userNam[0],date=date,description=description,amount=amount,split=split)
+			print("thid id usersnmrs")
+			print(userName)
+			obj=GroupExpense.objects.create(group=grp[0],paidby=onlyusername,date=date,description=description,amount=amount,split=split)
 			obj.save()
 			c=0
 			sm=sum(pdlist)
@@ -338,7 +359,7 @@ def GroupExpenseAddAPIView(request,id):
 				if(finlst[c]>0):
 					Dict1.update({userNam[c]:finlst[c]})
 				else:
-					Dict2.update({userNam[c]:abs(int(finlst[c]))})
+					Dict2.update({userNam[c]:abs(float(finlst[c]))})
 				c=c+1
 			del Dict2['']
 			del Dict1['']
@@ -354,7 +375,7 @@ def GroupExpenseAddAPIView(request,id):
 				cat,created=Category.objects.get_or_create(name='Group - ' + str(Gpn))
 				if created:
 					cat.save()
-				obj=Expense.objects.create(user=Users_in_Group,category=cat,date=date,description=description,amount=pdlist[ul],owe=finlst[ul])
+				obj=Expense.objects.create(user=Users_in_Group,category=cat,date=date,description=description,amount=pdlist[ul],owe=float(finlst[ul]))
 				obj.save()
 				ul=ul+1
 

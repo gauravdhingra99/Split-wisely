@@ -31,7 +31,7 @@ class GroupExpense(models.Model):
     date = models.DateField()
     description = models.CharField(max_length=300)
     amount = models.FloatField()
-    paidby=models.ForeignKey(User,on_delete=models.CASCADE)
+    paidby=models.CharField(User,null=False,max_length=300)
     split=models.BooleanField(default=False)
 
     def __str__(self):
