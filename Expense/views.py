@@ -68,12 +68,18 @@ def ExpenseDelView(request):
 		des=request.GET.get('delt')	
 		if des!=None:
 			qs=Expense.objects.filter(user=request.user,description=des)
-			qs.delete()
-			queryset=Expense.objects.filter(user=request.user)
-			print(qs)
-			return render(request,'Expense/Expense_Page.html',{"expenses": queryset.values('category__name','description','owe','amount','date')})
+			if qs:
+				qs.delete()
+				queryset=Expense.objects.filter(user=request.user)
+				print(qs)
+				return render(request,'Expense/Expense_Page2.html',{"message":"Deleted","expenses": queryset.values('category__name','description','owe','amount','date')})
+			else:
+				queryset=Expense.objects.filter(user=request.user)
+				return render(request,'Expense/Expense_Page2.html',{"message":"This expenses doesnt exists","expenses": queryset.values('category__name','description','owe','amount','date')})
+
 		else:
-			return render(request,'Expense/Expense_Page.html',{"message":message,"expenses": qs.values('category__name','description','owe','amount','date')})
+			queryset=Expense.objects.filter(user=request.user)
+			return render(request,'Expense/Expense_Page2.html',{"message":"Del Field cannot be empty on this url","expenses": queryset.values('category__name','description','owe','amount','date')})
 
 
 def AllGroups(request):
