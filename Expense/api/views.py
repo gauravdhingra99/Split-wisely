@@ -21,19 +21,13 @@ from rest_framework.permissions import IsAuthenticated
 class ExpenseListAPIView(APIView):
 
 	renderer_classes = [TemplateHTMLRenderer]
-	template_name = 'Expense/index.html'	
+	template_name = 'Expense/index.html'
 
 	def get(self,request):
-		print(request.GET)
-		des=request.query_params.get('description')
-		if des==None:
-			qs=Expense.objects.filter(user=request.user)
-			# print(qs)
-			return Response({'expenses': qs.values()})
+		if request.query_params.get('description')==None:
+			return Response({'expenses': Expense.objects.filter(user=request.user).values()})
 		else:
-			qs=Expense.objects.filter(user=request.user,description=des)
-			# print(qs)
-			return Response({'expenses': qs.values()})
+			return Response({'expenses': Expense.objects.filter(user=request.user,description=des).values()})
 
 
 class ExpenseAddAPIView(APIView):
@@ -44,21 +38,16 @@ class ExpenseAddAPIView(APIView):
 
 
 	def post(self,request):
-		# print(request.data)
 		category=request.data.get('category','')
 		date=request.data.get('date','')
 		description=request.data.get('description','')
 		amount=request.data.get('amount','')
-		# print(category)
-		# print(type(category))
 		
 
 		if category and date and description and amount:
 			cat,created=Category.objects.get_or_create(name=category)
 			if created:
-				# print(cat)
 				cat.save()
-			# print(request.user)
 			qs,namea=Expense.objects.get_or_create(user=request.user,category=cat,date=date,description=description,amount=amount)
 			if namea:
 				qs.save()
@@ -69,15 +58,11 @@ class ExpenseAddAPIView(APIView):
 
 
 	def delete(self,request):
-		print("sdadadasd"+request.data)
-		description=request.data.get("description")
-		print("des"+description)
-		if description:
-			des=Expense.objects.filter(description=description)
+		if request.data.get("description"):
+			des=Expense.objects.filter(description=request.data.get("description"))
 			if des is not None:
 				des.delete()
-				data=Expense.objects.all()
-				return Response({"data":data},status=200)
+				return Response({"data":Expense.objects.all()},status=200)
 			else:
 				return Response({"This Discription in not available"},status=400)
 		else:
