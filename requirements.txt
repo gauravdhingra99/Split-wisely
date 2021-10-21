@@ -1,5 +1,5 @@
 attrs==19.1.0
-Babel==2.6.0
+Babel==2.9.1
 certifi==2018.11.29
 cffi==1.12.2
 chardet==3.0.4
